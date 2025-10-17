@@ -6,6 +6,7 @@ import os
 import base64
 from uuid import uuid4
 
+# server class
 class DatabaseServer:
     def __init__(self, host='0.0.0.0', port=65432):
         self.host = host
@@ -15,32 +16,9 @@ class DatabaseServer:
         self.server_socket.listen()
         print(f"Server started on {self.host}:{self.port}")
 
+    # method for create database
     def setup_database(self):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            admin INTEGER NOT NULL DEFAULT 0,
-            authorized INTEGER NOT NULL DEFAULT 0
-        )
-        """)
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS recipes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            author_name TEXT NOT NULL,
-            recipe_name TEXT NOT NULL,
-            description TEXT NOT NULL,
-            cooking_time INTEGER NOT NULL,
-            products TEXT NOT NULL,
-            picture_path TEXT NOT NULL,
-            confirmed INTEGER NOT NULL DEFAULT 0
-        )
-        """)
-        db.commit()
-        db.close()
+        pass
 
     def handle_client(self, conn, addr):
         print(f"Connected by {addr}")
