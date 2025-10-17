@@ -26,6 +26,8 @@ class User(Base):
 
     recipes = relationship("Recipe", back_populates="user")
 
+    def __repr__(self):
+        return f"User(id={self.id}, name={self.username}, password={self.password}, admin={bool(self.admin)}, authorized={bool(self.authorized)})"
 
 # recipe model
 class Recipe(Base):
@@ -42,6 +44,11 @@ class Recipe(Base):
     user = relationship("User", back_populates="recipes")
     products = relationship("Product", secondary=association_table, back_populates="recipes")
 
+    def __repr__(self):
+        return f"Recipe(id={self.id}, name={self.name}, user_id={self.user_id}...)"
+
+
+
 # product model
 class Product(Base):
     __tablename__ = "products"
@@ -50,3 +57,31 @@ class Product(Base):
     name = Column(String(100), nullable=False, unique=True)
 
     recipes = relationship("Recipe", secondary=association_table, back_populates="products")
+
+    def __repr__(self):
+        return f"Product(id={self.id}, name={self.name})"
+
+if __name__ == "__main__":
+    user = User(
+        username = "Andrei",
+        password = "BhuBhu123",
+        admin = 1,
+        authorized = 1
+    )
+
+    recipe = Recipe(
+        name = "test",
+        description = "test",
+        cooking_time = 1,
+        picture_path = "test",
+        confirmed = 1,
+        user_id = 1
+    )
+
+    product = Product(
+        name="Test"
+    )
+
+    print(user)
+    print(recipe)
+    print(product)
