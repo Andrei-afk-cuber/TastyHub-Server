@@ -14,13 +14,15 @@ class UserDAO:
 
     # method for get one object from database by id
     def get_one(self, id):
-        user = self.session.query(User).get(id)
-        return user
+        return self.session.query(User).get(id)
 
     # method for get all objects from database
     def get_all(self):
-        users = self.session.query(User).all()
-        return users
+        return self.session.query(User).all()
+
+    # method for get user by username
+    def get_by_username(self, username):
+        return self.session.query(User).filter(User.username == username).first()
 
     # method for update data
     def update(self, new_user: User):
@@ -30,6 +32,7 @@ class UserDAO:
         user.password = new_user.username
         user.admin = new_user.admin
         user.authorized = new_user.authorized
+        return user
 
     # method for delete object
     def delete(self, id):

@@ -1,22 +1,19 @@
 from marshmallow import Schema, fields
 
-class TestClass:
-    def __init__(self, id, word):
-        self.id = id
-        self.word = word
+class UserSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    username = fields.String(required=True)
+    password = fields.String(required=True, load_only=True)
 
-class TestSchema(Schema):
-    id = fields.Integer()
-    word = fields.String()
+input_json = {
+    "id":999,
+    "username":"john",
+    "password":"secret123"
+}
 
-obj = TestClass(id=1, word="Hello, world")
+schema = UserSchema()
+user_obj = schema.load(input_json)
 
-res = TestSchema().dump(obj)
-
-print(type(res))
-print(res)
-
-res = TestSchema().load(res)
-
-print(type(res))
-print(res)
+print(user_obj.id)
+print(user_obj.username)
+print(user_obj.password)
