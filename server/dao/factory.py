@@ -8,6 +8,7 @@ from server.dao.user import UserDAO
 from server.dao.recipe import RecipeDAO
 from server.dao.product import ProductDAO
 
+# factory for get life-time session control
 class DAOFactory:
     def __init__(self, create_tables=True):
         # create engine for session
