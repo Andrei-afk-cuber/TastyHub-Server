@@ -11,6 +11,7 @@ class UserDAO:
     # method for add object to database
     def create(self, user: User):
         self.session.add(user)
+        self.session.commit()
 
     # method for get one object from database by id
     def get_one(self, id):
@@ -25,19 +26,25 @@ class UserDAO:
         return self.session.query(User).filter(User.username == username).first()
 
     # method for update data
-    def update(self, new_user: User):
-        user = self.session.query(User).get(new_user.id)
+    def update(self, new_user_data):
+        user = self.session.query(User).get(new_user_data['id'])
 
-        user.username = new_user.username
-        user.password = new_user.username
-        user.admin = new_user.admin
-        user.authorized = new_user.authorized
-        return user
+        if 'username' in new_user_data:
+            user.username = new_user_data['username']
+        if 'password' in new_user_data:
+            user.password = new_user_data['password']
+        if 'admin' in new_user_data:
+            user.admin = new_user_data['admin']
+        if 'authorized' in new_user_data:
+            user.authorized = new_user_data['authorized']
+
+        self.session.commit()
 
     # method for delete object
     def delete(self, id):
         user = self.get_one(id)
         self.session.delete(user)
+        self.session.commit()
 
 # Test dao
 if __name__ == "__main__":

@@ -9,21 +9,30 @@ class ProductDAO:
         self.session = session
 
     # method for add object to database
-    def create(self, user: Product):
-        pass
+    def create(self, product: Product):
+        self.session.add(product)
+
 
     # method for get one object from database by id
     def get_one(self, id):
-        pass
+        return self.session.query(Product).get(id)
 
     # method for get all objects from database
     def get_all(self):
-        pass
+        return self.session.query(Product).all()
 
     # method for update data
     def update(self, new_product):
-        pass
+        product = self.session.query(Product).get(new_product.id)
+
+        product.name = new_product.name
+
+        self.session.commit()
 
     # method for delete object
     def delete(self, id):
-        pass
+        product = self.get_one(id)
+        self.session.delete(product)
+
+if __name__ == "__main__":
+    pass

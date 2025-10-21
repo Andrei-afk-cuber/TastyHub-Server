@@ -4,7 +4,6 @@ import hashlib
 
 # imports dependencies
 from server.config import PWD_SALT, PWD_ITERATIONS
-from server.dao.user import UserDAO
 from server.dao.models.main import User
 from server.dao.factory import DAOFactory
 
@@ -47,12 +46,13 @@ class UserService:
 
     # service method for update user
     def update(self, user_data):
-        new_user = User(**user_data)
-
         with self.factory_dao.user_dao() as dao:
-            dao.update(new_user)
+            dao.update(user_data)
 
-        return new_user
+    # service method for delete user
+    def delete(self, id):
+        with self.factory_dao.user_dao() as dao:
+            dao.delete(id)
 
     # method for convert password to hash (base64 encoding)
     def get_password_hash(self, password: str):
