@@ -1,3 +1,5 @@
+from typing import List
+
 # necessary imports (temp)
 from sqlalchemy.orm import Session
 
@@ -9,24 +11,24 @@ class ProductDAO:
         self.session = session
 
     # method for add object to database
-    def create(self, product: Product):
+    def create(self, product: Product) -> None:
         self.session.add(product)
         self.session.commit()
 
     # method for get one object from database by id
-    def get_one(self, pid):
+    def get_one(self, pid: int) -> Product:
         return self.session.query(Product).get(pid)
 
     # method for get product by name
-    def get_by_name(self, name):
-        return self.session.query(Product).filter(Product.name == name)
+    def get_by_name(self, name: str) -> Product:
+        return self.session.query(Product).filter(Product.name == name).first()
 
     # method for get all objects from database
-    def get_all(self):
+    def get_all(self) -> List[Product]:
         return self.session.query(Product).all()
 
     # method for update data
-    def update(self, new_product):
+    def update(self, new_product: dict) -> None:
         product = self.session.query(Product).get(new_product['id'])
 
         if 'name' in new_product:
@@ -35,10 +37,11 @@ class ProductDAO:
         self.session.commit()
 
     # method for delete object
-    def delete(self, pid):
+    def delete(self, pid: int) -> None:
         product = self.get_one(pid)
         self.session.delete(product)
         self.session.commit()
 
+# code for testing (temp)
 if __name__ == "__main__":
     pass
