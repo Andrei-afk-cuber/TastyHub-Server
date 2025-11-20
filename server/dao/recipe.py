@@ -1,5 +1,5 @@
 # necessary imports
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -16,7 +16,7 @@ class RecipeDAO:
         self.session.commit()
 
     # method for get one object from database by id
-    def get_one(self, id: int) -> Recipe:
+    def get_one(self, id: int) -> Optional[Recipe]:
         return self.session.query(Recipe).get(id)
 
     # method for get recipe by name
@@ -31,18 +31,19 @@ class RecipeDAO:
     def update(self, new_recipe_data: dict) -> None:
         recipe = self.session.query(Recipe).get(new_recipe_data['id'])
 
-        if 'name' in new_recipe_data:
-            recipe.name = new_recipe_data['name']
-        if 'description' in new_recipe_data:
-            recipe.description = new_recipe_data['description']
-        if 'cooking_time' in new_recipe_data:
-            recipe.cooking_time = new_recipe_data['cooking_time']
-        if 'picture_path' in new_recipe_data:
-            recipe.picture_path = new_recipe_data['picture_path']
-        if 'confirmed' in new_recipe_data:
-            recipe.confirmed = new_recipe_data['confirmed']
+        if recipe:
+            if 'name' in new_recipe_data:
+                recipe.name = new_recipe_data['name']
+            if 'description' in new_recipe_data:
+                recipe.description = new_recipe_data['description']
+            if 'cooking_time' in new_recipe_data:
+                recipe.cooking_time = new_recipe_data['cooking_time']
+            if 'picture_path' in new_recipe_data:
+                recipe.picture_path = new_recipe_data['picture_path']
+            if 'confirmed' in new_recipe_data:
+                recipe.confirmed = new_recipe_data['confirmed']
 
-        self.session.commit()
+            self.session.commit()
 
     # method for delete object
     def delete(self, id: int) -> None:

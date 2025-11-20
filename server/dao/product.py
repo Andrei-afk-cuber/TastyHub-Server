@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 # necessary imports (temp)
 from sqlalchemy.orm import Session
@@ -16,11 +16,11 @@ class ProductDAO:
         self.session.commit()
 
     # method for get one object from database by id
-    def get_one(self, pid: int) -> Product:
+    def get_one(self, pid: int) -> Optional[Product]:
         return self.session.query(Product).get(pid)
 
     # method for get product by name
-    def get_by_name(self, name: str) -> Product:
+    def get_by_name(self, name: str) -> Optional[Product]:
         return self.session.query(Product).filter(Product.name == name).first()
 
     # method for get all objects from database
@@ -31,10 +31,11 @@ class ProductDAO:
     def update(self, new_product: dict) -> None:
         product = self.session.query(Product).get(new_product['id'])
 
-        if 'name' in new_product:
-            product.name = new_product['name']
+        if product:
+            if 'name' in new_product:
+                product.name = new_product['name']
 
-        self.session.commit()
+            self.session.commit()
 
     # method for delete object
     def delete(self, pid: int) -> None:
