@@ -1,32 +1,34 @@
 # necessary imports
+from typing import List
+
 from sqlalchemy.orm import Session
 
 from server.dao.models.main import Recipe
 
 # dao for recipe model
 class RecipeDAO:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     # method for add object to database
-    def create(self, recipe: Recipe):
+    def create(self, recipe: Recipe) -> None:
         self.session.add(recipe)
         self.session.commit()
 
     # method for get one object from database by id
-    def get_one(self, id):
+    def get_one(self, id: int) -> Recipe:
         return self.session.query(Recipe).get(id)
 
     # method for get recipe by name
-    def get_by_name(self, name):
-        return self.session.query(Recipe).filter(Recipe.name == name)
+    def get_by_name(self, name: str) -> List[Recipe]:
+        return self.session.query(Recipe).filter(Recipe.name == name).all()
 
     # method for get all objects from database
-    def get_all(self):
+    def get_all(self) -> List[Recipe]:
         return self.session.query(Recipe).all()
 
     # method for update data
-    def update(self, new_recipe_data):
+    def update(self, new_recipe_data: dict) -> None:
         recipe = self.session.query(Recipe).get(new_recipe_data['id'])
 
         if 'name' in new_recipe_data:
@@ -43,7 +45,7 @@ class RecipeDAO:
         self.session.commit()
 
     # method for delete object
-    def delete(self, id):
+    def delete(self, id: int) -> None:
         recipe = self.session.query(Recipe).get(id)
         self.session.delete(recipe)
         self.session.commit()
