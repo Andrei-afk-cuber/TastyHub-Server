@@ -1,6 +1,7 @@
 # import libraries
 import base64
 import hashlib
+from typing import List
 
 # imports dependencies
 from server.config import PWD_SALT, PWD_ITERATIONS
@@ -9,11 +10,11 @@ from server.dao.factory import DAOFactory
 
 # service for user
 class UserService:
-    def __init__(self, factory_dao: DAOFactory):
+    def __init__(self, factory_dao: DAOFactory) -> None:
         self.factory_dao = factory_dao
 
     # service method for create user
-    def create(self, user_data):
+    def create(self, user_data: dict) -> User:
         # convert password to hash
         user_data['password'] = self.get_password_hash(user_data['password'])
 
@@ -24,38 +25,38 @@ class UserService:
         return user
 
     # service method for get user by id
-    def get_one(self, id: int):
+    def get_one(self, id: int) -> User:
         with self.factory_dao.user_dao() as dao:
             user = dao.get_one(id)
 
         return user
 
     # service method for get user by username
-    def get_by_username(self, username: str):
+    def get_by_username(self, username: str) -> User:
         with self.factory_dao.user_dao() as dao:
             user = dao.get_by_username(username)
 
         return user
 
     # service method for get all users
-    def get_all(self):
+    def get_all(self) -> List[User]:
         with self.factory_dao.user_dao() as dao:
             users = dao.get_all()
 
         return users
 
     # service method for update user
-    def update(self, user_data):
+    def update(self, user_data: dict) -> None:
         with self.factory_dao.user_dao() as dao:
             dao.update(user_data)
 
     # service method for delete user
-    def delete(self, id):
+    def delete(self, id: int) -> None:
         with self.factory_dao.user_dao() as dao:
             dao.delete(id)
 
     # method for convert password to hash (base64 encoding)
-    def get_password_hash(self, password: str):
+    def get_password_hash(self, password: str) -> bytes:
         hash_digest = hashlib.pbkdf2_hmac(
             'sha256',
             password.encode('utf-8'),
