@@ -120,22 +120,6 @@ class DatabaseServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-
-    # def register_user(self, username, password):
-    #     db = sqlite3.connect('database.db')
-    #     cursor = db.cursor()
-    #     try:
-    #         cursor.execute("INSERT INTO users (username, password, admin, authorized) VALUES (?, ?, ?, ?)",
-    #                        (username, password, False, False))
-    #         db.commit()
-    #         return {"status": "success"}
-    #     except sqlite3.IntegrityError:
-    #         return {"status": "error", "message": "Username already exists"}
-    #     except sqlite3.Error as e:
-    #         return {"status": "error", "message": str(e)}
-    #     finally:
-    #         db.close()
-
     def start(self):
         self.setup_database()
         print("Server is running and waiting for connections...")
