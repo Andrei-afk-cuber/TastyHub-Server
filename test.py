@@ -1,19 +1,23 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
+from dataclasses import dataclass
 
 class UserSchema(Schema):
-    id = fields.Integer(dump_only=True)
+    id = fields.Integer()
     username = fields.String(required=True)
-    password = fields.String(required=True, load_only=True)
+    password = fields.String(required=True)
 
-input_json = {
-    "id":999,
-    "username":"john",
-    "password":"secret123"
-}
+    @post_load
+    def make_user(self, data, **kwargs):
+        return User(**data)
 
-schema = UserSchema()
-user_obj = schema.load(input_json)
+@dataclass
+class User:
+    id: int = 1
+    username: str = "test_user"
+    password: str = 'QwErTy'
 
-print(user_obj.id)
-print(user_obj.username)
-print(user_obj.password)
+user = User()
+
+user = UserSchema().dumps(user)
+print(type(user))
+print(user)

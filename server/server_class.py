@@ -6,6 +6,8 @@ import os
 import base64
 from uuid import uuid4
 
+from server.containers import user_service, user_schema
+
 # server class
 class DatabaseServer:
     def __init__(self, host='0.0.0.0', port=65432):
@@ -98,29 +100,15 @@ class DatabaseServer:
         else:
             return {"status": "error", "message": "Unknown action"}
 
-    def check_login(self, username, password):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
-        try:
-            cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
-            result = cursor.fetchone()
-            if result:
-                return {
-                    "status": "success",
-                    "user": {
-                        "id": result[0],
-                        "username": result[1],
-                        "password": result[2],
-                        "admin": bool(result[3]),
-                        "authorized": bool(result[4])
-                    }
-                }
-            else:
-                return {"status": "error", "message": "Invalid credentials"}
-        except sqlite3.Error as e:
-            return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
+    @staticmethod
+    def check_login(username, password):
+        user = user_service.get_by_username(username)
+        if not user:
+            return {"status": "error", "message": "User not found"}
+        if user['password'] != password:
+            return {"status": "error", "message": "Incorrect password"}
+
+        return user_schema.dumps(user)
 
     def register_user(self, username, password):
         db = sqlite3.connect('database.db')
@@ -388,6 +376,7 @@ class DatabaseServer:
         finally:
             db.close()
 
+# debugger run
 if __name__ == "__main__":
-    server = DatabaseServer()
-    server.start()
+    result = DatabaseServer().check_login(username='admin', password='BhuBhu123')
+    print(result)

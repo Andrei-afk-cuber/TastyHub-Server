@@ -1,6 +1,5 @@
 # import all necessary libraries
 from sqlalchemy import Column, String, Integer, ForeignKey, Table, PrimaryKeyConstraint
-
 from sqlalchemy.orm import relationship
 
 # import dependencies

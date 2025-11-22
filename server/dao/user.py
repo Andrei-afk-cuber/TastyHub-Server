@@ -23,7 +23,7 @@ class UserDAO:
 
     # method for get user by username
     def get_by_username(self, username):
-        return self.session.query(User).filter(User.username == username).first()
+        return self.session.query(User).where(User.username == username).first()
 
     # method for update data
     def update(self, new_user_data):
@@ -46,6 +46,6 @@ class UserDAO:
         self.session.delete(user)
         self.session.commit()
 
-# Test dao
+# run debugger
 if __name__ == "__main__":
     pass

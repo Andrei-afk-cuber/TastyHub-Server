@@ -12,7 +12,7 @@ from server.dao.product import ProductDAO
 class DAOFactory:
     def __init__(self, create_tables=True):
         # create engine for session
-        self.engine = create_engine(DB_URL, echo=True)
+        self.engine = create_engine(DB_URL)
 
         # create tables if create_tables == True
         if create_tables:
@@ -70,4 +70,6 @@ class DAOFactory:
 
 # Using factory-class example
 if __name__ == "__main__":
-    factory = DAOFactory(create_tables=True)
+    factory = DAOFactory()
+    with factory.user_dao() as u:
+        print(u.get_by_username('admin'))
