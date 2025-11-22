@@ -70,7 +70,4 @@ class DAOFactory:
 
 # Using factory-class example
 if __name__ == "__main__":
-    factory = DAOFactory()
-
-    with factory.user_dao() as user_dao:
-        user = user_dao.create(None)
+    factory = DAOFactory(create_tables=True)
