@@ -100,30 +100,41 @@ class DatabaseServer:
         else:
             return {"status": "error", "message": "Unknown action"}
 
+    # method for check user login
     @staticmethod
-    def check_login(username, password):
+    def check_login(username: str, password: str) -> dict:
         user = user_service.get_by_username(username)
         if not user:
             return {"status": "error", "message": "User not found"}
-        if user['password'] != password:
+        if user['password'] != user_service.get_password_hash(password):
             return {"status": "error", "message": "Incorrect password"}
 
-        return user_schema.dumps(user)
+        return user_schema.dump(user)
 
-    def register_user(self, username, password):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    # static method for create new user
+    @staticmethod
+    def register_user(username: str, password: str) -> dict:
         try:
-            cursor.execute("INSERT INTO users (username, password, admin, authorized) VALUES (?, ?, ?, ?)",
-                           (username, password, False, False))
-            db.commit()
-            return {"status": "success"}
-        except sqlite3.IntegrityError:
-            return {"status": "error", "message": "Username already exists"}
-        except sqlite3.Error as e:
+            user_service.create(user_data={'username': username, 'password': password})
+            return {"status": "success", "message": "User created"}
+        except Exception as e:
             return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
+
+
+    # def register_user(self, username, password):
+    #     db = sqlite3.connect('database.db')
+    #     cursor = db.cursor()
+    #     try:
+    #         cursor.execute("INSERT INTO users (username, password, admin, authorized) VALUES (?, ?, ?, ?)",
+    #                        (username, password, False, False))
+    #         db.commit()
+    #         return {"status": "success"}
+    #     except sqlite3.IntegrityError:
+    #         return {"status": "error", "message": "Username already exists"}
+    #     except sqlite3.Error as e:
+    #         return {"status": "error", "message": str(e)}
+    #     finally:
+    #         db.close()
 
     def start(self):
         self.setup_database()
@@ -378,5 +389,3 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    result = DatabaseServer().check_login(username='admin', password='BhuBhu123')
-    print(result)
