@@ -25,25 +25,46 @@ class UserService:
         return user
 
     # service method for get user by id
-    def get_one(self, id: int) -> User:
+    def get_one(self, id: int) -> dict:
         with self.factory_dao.user_dao() as dao:
             user = dao.get_one(id)
 
-        return user
+            return {
+                'id':user.id,
+                'username':user.username,
+                'password':user.password,
+                'admin':user.admin,
+                'authorized':user.authorized,
+            }
 
     # service method for get user by username
-    def get_by_username(self, username: str) -> User:
+    def get_by_username(self, username: str) -> dict:
         with self.factory_dao.user_dao() as dao:
             user = dao.get_by_username(username)
 
-        return user
+            return {
+                'id':user.id,
+                'username':user.username,
+                'password':user.password,
+                'admin':user.admin,
+                'authorized':user.authorized,
+            }
 
     # service method for get all users
-    def get_all(self) -> List[User]:
+    def get_all(self) -> List[dict]:
+        result = []
         with self.factory_dao.user_dao() as dao:
             users = dao.get_all()
+            for user in users:
+                result.append({
+                    'id': user.id,
+                    'username': user.username,
+                    'password': user.password,
+                    'admin': user.admin,
+                    'authorized': user.authorized
+                })
 
-        return users
+        return result
 
     # service method for update user
     def update(self, user_data: dict) -> None:
@@ -56,7 +77,8 @@ class UserService:
             dao.delete(id)
 
     # method for convert password to hash (base64 encoding)
-    def get_password_hash(self, password: str) -> bytes:
+    @staticmethod
+    def get_password_hash(password: str) -> bytes:
         hash_digest = hashlib.pbkdf2_hmac(
             'sha256',
             password.encode('utf-8'),
@@ -65,3 +87,11 @@ class UserService:
         )
 
         return base64.b64encode(hash_digest)
+
+if __name__ == "__main__":
+    factory = DAOFactory()
+    service = UserService(factory)
+    print(UserService.get_by_username(service, username="admin"))
+    print(UserService.get_one(service, id=1))
+    print(UserService.get_one(service, id=2))
+    print(UserService.get_all(service))
