@@ -71,7 +71,7 @@ class DatabaseServer:
             by_author = request.get('by_author', None)
             by_name = request.get('by_name', None)
             by_ingredients = request.get('by_ingredients', None)
-            return self.load_recipes(only_confirmed, limit, by_author, by_name, by_ingredients)
+            return self.load_recipes(only_confirmed, by_name, by_ingredients)
         elif action == 'activate_user':
             user_id = request.get('user_id')
             return self.activate_user(user_id)
@@ -131,10 +131,12 @@ class DatabaseServer:
     # static method for load recipes
     @staticmethod
     def load_recipes(only_confirmed=True, by_name=None, by_ingredients=None):
+        recipes = None
+
         if by_name:
             recipes = recipe_service.get_by_name(by_name.lower())
         elif by_ingredients:
-            pass                                                                   # This method not allowed now
+            pass                                                                   # This method not allowed now (need to use join for join three tables)
         else:
             recipes = recipe_service.get_all(only_confirmed)
 
@@ -198,27 +200,39 @@ class DatabaseServer:
     #     finally:
     #         db.close()
 
-    def load_users(self):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
-        users = []
-        try:
-            cursor.execute("SELECT * FROM users")
-            columns = [col[0] for col in cursor.description]
-            for row in cursor.fetchall():
-                row_dict = dict(zip(columns, row))
-                users.append({
-                    "id": row_dict["id"],
-                    "username": row_dict['username'],
-                    "password": row_dict['password'],
-                    "admin": bool(row_dict['admin']),
-                    "authorized": bool(row_dict['authorized'])
-                })
-            return {"status": "success", "users": users}
-        except sqlite3.Error as e:
-            return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
+    @staticmethod
+    def load_users():
+        users = user_service.get_all()
+        if not users:
+            return {"status": "error", "message": "No users found"}
+
+        return {"status": "success", "users": users}
+
+    # @staticmethod
+    # def load_users():
+    #     db = sqlite3.connect('database.db')
+    #     cursor = db.cursor()
+    #     users = []
+    #     try:
+    #         cursor.execute("SELECT * FROM users")
+    #         columns = [col[0] for col in cursor.description]
+    #         for row in cursor.fetchall():
+    #             row_dict = dict(zip(columns, row))
+    #             users.append({
+    #                 "id": row_dict["id"],
+    #                 "username": row_dict['username'],
+    #                 "password": row_dict['password'],
+    #                 "admin": bool(row_dict['admin']),
+    #                 "authorized": bool(row_dict['authorized'])
+    #             })
+    #         return {"status": "success", "users": users}
+    #     except sqlite3.Error as e:
+    #         return {"status": "error", "message": str(e)}
+    #     finally:
+    #         db.close()
+
+    def save_recipe(self, recipe_data: dict):
+        pass
 
     def save_recipe(self, recipe_data):
         db = sqlite3.connect('database.db')
@@ -389,4 +403,5 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.load_recipes(False, by_name='б'))
+    for user in DatabaseServer.load_users()['users']:
+        print(user)
