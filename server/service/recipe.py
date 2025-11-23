@@ -24,11 +24,42 @@ class RecipeService:
         return recipe
 
     # method for get recipe by name
-    def get_by_name(self, name: str) -> List[Recipe]:
+    def get_by_name(self, name: str) -> list:
+        result = []
         with self.factory_dao.recipe_dao() as dao:
-            recipe = dao.get_by_name(name)
+            recipes = dao.get_by_name(name)
 
-        return recipe
+            for recipe in recipes:
+                result.append({
+                    'id': recipe.id,
+                    'name': recipe.name,
+                    'description': recipe.description,
+                    'cooking_time': recipe.cooking_time,
+                    'picture_path': recipe.picture_path,
+                    'confirmed': recipe.confirmed,
+                    'user_id': recipe.user_id
+                })
+
+        return result
+
+    # method for get all recipes
+    def get_all(self, only_confirmed=True):
+        result = []
+        with self.factory_dao.recipe_dao() as dao:
+            recipes = dao.get_all(only_confirmed=only_confirmed)
+
+            for recipe in recipes:
+                result.append({
+                    'id': recipe.id,
+                    'name': recipe.name,
+                    'description': recipe.description,
+                    'cooking_time': recipe.cooking_time,
+                    'picture_path': recipe.picture_path,
+                    'confirmed': recipe.confirmed,
+                    'user_id': recipe.user_id
+                })
+
+        return result
 
     # method for update recipe
     def update(self, recipe_data: dict) -> None:
@@ -39,3 +70,9 @@ class RecipeService:
     def delete(self, id: int) -> None:
         with self.factory_dao.recipe_dao() as dao:
             dao.delete(id)
+
+# debugger run
+if __name__ == '__main__':
+    factory = DAOFactory()
+    service = RecipeService(factory)
+    print(RecipeService.get_all(service))

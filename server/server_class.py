@@ -6,7 +6,7 @@ import os
 import base64
 from uuid import uuid4
 
-from server.containers import user_service, user_schema
+from server.containers import user_service, user_schema, recipe_service, recipes_schema, recipe_schema
 
 # server class
 class DatabaseServer:
@@ -128,59 +128,75 @@ class DatabaseServer:
             client_thread = threading.Thread(target=self.handle_client, args=(conn, addr))
             client_thread.start()
 
-    def load_recipes(self, only_confirmed=True, limit=None, by_author=None, by_name=None, by_ingredients=None):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
-        recipes = []
-        try:
-            query = "SELECT * FROM recipes"
-            params = []
-            conditions = []
-            if only_confirmed:
-                conditions.append("confirmed = 1")
-            if by_author:
-                conditions.append("author_name = ?")
-                params.append(by_author)
-            if by_name:
-                conditions.append("recipe_name LIKE ?")
-                params.append(f"%{by_name}%")
-            if by_ingredients:
-                ingredients = [i.strip() for i in by_ingredients.split(",")]
-                ing_conditions = []
-                for ingredient in ingredients:
-                    ing_conditions.append("products LIKE ?")
-                    params.append(f"%{ingredient}%")
-                conditions.append(f"({' AND '.join(ing_conditions)})")
-            if conditions:
-                query += " WHERE " + " AND ".join(conditions)
-            if limit is not None:
-                query += " LIMIT ?"
-                params.append(limit)
-            cursor.execute(query, params)
-            columns = [col[0] for col in cursor.description]
-            for row in cursor.fetchall():
-                row_dict = dict(zip(columns, row))
-                image_data = None
-                image_path = os.path.join("recipe_images", row_dict['picture_path'])
-                if os.path.exists(image_path):
-                    with open(image_path, 'rb') as img_file:
-                        image_data = base64.b64encode(img_file.read()).decode('utf-8')
-                recipes.append({
-                    "id": row_dict["id"],
-                    "author_name": row_dict['author_name'],
-                    "recipe_name": row_dict['recipe_name'],
-                    "description": row_dict['description'],
-                    "cooking_time": row_dict['cooking_time'],
-                    "products": row_dict['products'],
-                    "picture_path": row_dict['picture_path'],
-                    "confirmed": bool(row_dict['confirmed']),
-                    "image_data": image_data
-                })
-            return {"status": "success", "recipes": recipes}
-        except sqlite3.Error as e:
-            return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
+    # static method for load recipes
+    @staticmethod
+    def load_recipes(only_confirmed=True, by_name=None, by_ingredients=None):
+        if by_name:
+            recipes = recipe_service.get_by_name(by_name.lower())
+        elif by_ingredients:
+            pass                                                                   # This method not allowed now
+        else:
+            recipes = recipe_service.get_all(only_confirmed)
+
+        # check: is recipes empty?
+        if not recipes:
+            return {"status": "error", "message": "No recipes found"}
+
+        return {"status": "success", "recipes": recipes}
+
+    # def load_recipes(self, only_confirmed=True, limit=None, by_author=None, by_name=None, by_ingredients=None):
+    #     db = sqlite3.connect('database.db')
+    #     cursor = db.cursor()
+    #     recipes = []
+    #     try:
+    #         query = "SELECT * FROM recipes"
+    #         params = []
+    #         conditions = []
+    #         if only_confirmed:
+    #             conditions.append("confirmed = 1")
+    #         if by_author:
+    #             conditions.append("author_name = ?")
+    #             params.append(by_author)
+    #         if by_name:
+    #             conditions.append("recipe_name LIKE ?")
+    #             params.append(f"%{by_name}%")
+    #         if by_ingredients:
+    #             ingredients = [i.strip() for i in by_ingredients.split(",")]
+    #             ing_conditions = []
+    #             for ingredient in ingredients:
+    #                 ing_conditions.append("products LIKE ?")
+    #                 params.append(f"%{ingredient}%")
+    #             conditions.append(f"({' AND '.join(ing_conditions)})")
+    #         if conditions:
+    #             query += " WHERE " + " AND ".join(conditions)
+    #         if limit is not None:
+    #             query += " LIMIT ?"
+    #             params.append(limit)
+    #         cursor.execute(query, params)
+    #         columns = [col[0] for col in cursor.description]
+    #         for row in cursor.fetchall():
+    #             row_dict = dict(zip(columns, row))
+    #             image_data = None
+    #             image_path = os.path.join("recipe_images", row_dict['picture_path'])
+    #             if os.path.exists(image_path):
+    #                 with open(image_path, 'rb') as img_file:
+    #                     image_data = base64.b64encode(img_file.read()).decode('utf-8')
+    #             recipes.append({
+    #                 "id": row_dict["id"],
+    #                 "author_name": row_dict['author_name'],
+    #                 "recipe_name": row_dict['recipe_name'],
+    #                 "description": row_dict['description'],
+    #                 "cooking_time": row_dict['cooking_time'],
+    #                 "products": row_dict['products'],
+    #                 "picture_path": row_dict['picture_path'],
+    #                 "confirmed": bool(row_dict['confirmed']),
+    #                 "image_data": image_data
+    #             })
+    #         return {"status": "success", "recipes": recipes}
+    #     except sqlite3.Error as e:
+    #         return {"status": "error", "message": str(e)}
+    #     finally:
+    #         db.close()
 
     def load_users(self):
         db = sqlite3.connect('database.db')
@@ -373,4 +389,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    pass
+    print(DatabaseServer.load_recipes(False, by_name='б'))

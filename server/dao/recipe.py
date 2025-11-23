@@ -1,5 +1,6 @@
 # necessary imports
 from typing import List, Optional
+from sqlalchemy.orm import Session
 
 from sqlalchemy.orm import Session
 
@@ -21,10 +22,13 @@ class RecipeDAO:
 
     # method for get recipe by name
     def get_by_name(self, name: str) -> List[Recipe]:
-        return self.session.query(Recipe).filter(Recipe.name == name).all()
+        return self.session.query(Recipe).filter(Recipe.name.lower.like(f'%{name}%'), Recipe.confirmed == 1).all()
 
     # method for get all objects from database
-    def get_all(self) -> List[Recipe]:
+    def get_all(self, only_confirmed=True) -> List[Recipe]:
+        if only_confirmed:
+            return self.session.query(Recipe).filter(Recipe.confirmed == 1).all()
+
         return self.session.query(Recipe).all()
 
     # method for update data
