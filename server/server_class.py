@@ -329,7 +329,7 @@ class DatabaseServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    def activate_user(self, user_id):
+    def activate_user(self, user_id):                        # It's needed to update
         db = sqlite3.connect('database.db')
         cursor = db.cursor()
         try:
@@ -342,7 +342,7 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def deactivate_user(self, user_id):
+    def deactivate_user(self, user_id):                      # It's needed to update
         db = sqlite3.connect('database.db')
         cursor = db.cursor()
         try:
@@ -355,7 +355,7 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def confirm_recipe(self, recipe_id):
+    def confirm_recipe(self, recipe_id):                       # It's needed to update
         db = sqlite3.connect('database.db')
         cursor = db.cursor()
         try:
@@ -368,7 +368,7 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def grant_admin_privileges(self, user_id):
+    def grant_admin_privileges(self, user_id):                    # It's needed to update
         db = sqlite3.connect('database.db')
         cursor = db.cursor()
         try:
@@ -381,19 +381,14 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def delete_user(self, user_id):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    @staticmethod
+    def delete_user(user_id: int) -> dict:
         try:
-            cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
-            db.commit()
+            user_service.delete(user_id)
             return {"status": "success"}
-        except sqlite3.Error as e:
-            db.rollback()
-            return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
+        except Exception as e:
+            return {"status": "error", "message": "User not found"}
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.load_recipes(only_confirmed=False))
+    pass
