@@ -208,29 +208,6 @@ class DatabaseServer:
 
         return {"status": "success", "users": users}
 
-    # @staticmethod
-    # def load_users():
-    #     db = sqlite3.connect('database.db')
-    #     cursor = db.cursor()
-    #     users = []
-    #     try:
-    #         cursor.execute("SELECT * FROM users")
-    #         columns = [col[0] for col in cursor.description]
-    #         for row in cursor.fetchall():
-    #             row_dict = dict(zip(columns, row))
-    #             users.append({
-    #                 "id": row_dict["id"],
-    #                 "username": row_dict['username'],
-    #                 "password": row_dict['password'],
-    #                 "admin": bool(row_dict['admin']),
-    #                 "authorized": bool(row_dict['authorized'])
-    #             })
-    #         return {"status": "success", "users": users}
-    #     except sqlite3.Error as e:
-    #         return {"status": "error", "message": str(e)}
-    #     finally:
-    #         db.close()
-
     @staticmethod
     def save_recipe(recipe_data):                                 # it's needed to update
         db = sqlite3.connect('database.db')
@@ -274,47 +251,16 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def update_recipe(self, recipe_data, by_admin=False):          # it's needed to update
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    # static method for update recipe
+    @staticmethod
+    def update_recipe(recipe_data, by_admin=False):
         try:
-            recipe_id = recipe_data['id']
-            if recipe_data['image_data']:
-                old_image = os.path.join("recipe_images", recipe_data['old_image'])
-                if os.path.exists(old_image):
-                    os.remove(old_image)
-                image_data = base64.b64decode(recipe_data['image_data'])
-                ext = os.path.splitext(recipe_data['image_name'])[1]
-                unique_filename = f"{uuid4().hex}{ext}"
-                new_image_path = os.path.join("recipe_images", unique_filename)
-                with open(new_image_path, 'wb') as img_file:
-                    img_file.write(image_data)
-            else:
-                unique_filename = recipe_data['old_image']
-            cursor.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
-            cursor.execute("""
-                INSERT INTO recipes (
-                    id, author_name, recipe_name, description, 
-                    cooking_time, products, picture_path, confirmed
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                recipe_id,
-                recipe_data['author_name'],
-                recipe_data['recipe_name'],
-                recipe_data['description'],
-                recipe_data['cooking_time'],
-                recipe_data['products'],
-                unique_filename,
-                int(by_admin)
-            ))
-            db.commit()
+            recipe_service.update(recipe_data, by_admin)
             return {"status": "success"}
         except Exception as e:
-            db.rollback()
             return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
 
+    # static method for delete recipe
     @staticmethod
     def delete_recipe(recipe_id):
         try:
@@ -391,4 +337,13 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    pass
+    print(*(DatabaseServer.load_recipes(False)['recipes']), sep='\n')
+    print(DatabaseServer.update_recipe(by_admin=False, recipe_data={
+        'id': 4,
+        'name': 'test4_updated',
+        'description': 'test4_updated',
+        'cooking_time': 4,
+        'picture_path': 'updated',
+        'confirmed': 3,
+        'user_id': 8
+    }))

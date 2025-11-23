@@ -70,7 +70,10 @@ class RecipeService:
         return result
 
     # method for update recipe
-    def update(self, recipe_data: dict) -> None:
+    def update(self, recipe_data: dict, by_admin: bool = False) -> None:
+        if not by_admin:
+            recipe_data['confirmed'] = 0
+
         with self.factory_dao.recipe_dao() as dao:
             dao.update(recipe_data)
 
