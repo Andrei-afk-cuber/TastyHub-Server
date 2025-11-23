@@ -130,7 +130,7 @@ class DatabaseServer:
 
     # static method for load recipes
     @staticmethod
-    def load_recipes(only_confirmed=True, by_name=None, by_ingredients=None):
+    def load_recipes(only_confirmed=True, by_name=None, by_ingredients=None):      # update this method finally
         recipes = None
 
         if by_name:
@@ -231,10 +231,8 @@ class DatabaseServer:
     #     finally:
     #         db.close()
 
-    def save_recipe(self, recipe_data: dict):
-        pass
-
-    def save_recipe(self, recipe_data):
+    @staticmethod
+    def save_recipe(recipe_data):                                 # it's needed to update
         db = sqlite3.connect('database.db')
         cursor = db.cursor()
         try:
@@ -276,7 +274,7 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def update_recipe(self, recipe_data, by_admin=False):
+    def update_recipe(self, recipe_data, by_admin=False):          # it's needed to update
         db = sqlite3.connect('database.db')
         cursor = db.cursor()
         try:
@@ -317,24 +315,19 @@ class DatabaseServer:
         finally:
             db.close()
 
-    def delete_recipe(self, recipe_id):
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    @staticmethod
+    def delete_recipe(recipe_id):
         try:
-            cursor.execute("SELECT picture_path FROM recipes WHERE id = ?", (recipe_id,))
-            result = cursor.fetchone()
-            if result:
-                image_path = os.path.join("recipe_images", result[0])
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-            cursor.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
-            db.commit()
+            recipe = recipe_service.get_one(recipe_id)
+
+            image_path = os.path.join("recipe_images", recipe['picture_path'])
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+            recipe_service.delete(recipe_id)
             return {"status": "success"}
-        except sqlite3.Error as e:
-            db.rollback()
+        except Exception as e:
             return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
 
     def activate_user(self, user_id):
         db = sqlite3.connect('database.db')
@@ -403,5 +396,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    for user in DatabaseServer.load_users()['users']:
-        print(user)
+    print(DatabaseServer.load_recipes(only_confirmed=False))

@@ -17,11 +17,19 @@ class RecipeService:
         return recipe
 
     # method for get one recipe
-    def get_one(self, id: int) -> Recipe:
+    def get_one(self, id: int) -> dict:
         with self.factory_dao.recipe_dao() as dao:
             recipe = dao.get_one(id)
 
-        return recipe
+            return {
+                        'id': recipe.id,
+                        'name': recipe.name,
+                        'description': recipe.description,
+                        'cooking_time': recipe.cooking_time,
+                        'picture_path': recipe.picture_path,
+                        'confirmed': recipe.confirmed,
+                        'user_id': recipe.user_id
+                    }
 
     # method for get recipe by name
     def get_by_name(self, name: str) -> list:
