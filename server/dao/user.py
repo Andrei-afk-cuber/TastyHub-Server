@@ -40,6 +40,12 @@ class UserDAO:
 
         self.session.commit()
 
+    # method for activate user
+    def activate(self, id, activate=True):
+        user = self.get_one(id)
+        user.authorized = int(activate)
+        self.session.commit()
+
     # method for delete object
     def delete(self, id):
         user = self.get_one(id)

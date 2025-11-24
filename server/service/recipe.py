@@ -11,6 +11,7 @@ class RecipeService:
     # method for create recipe
     def create(self, product_data: dict) -> Recipe:
         with self.factory_dao.recipe_dao() as dao:
+            product_data['confirmed'] = 0
             recipe = Recipe(**product_data)
             dao.create(recipe)
 

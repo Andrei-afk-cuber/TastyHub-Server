@@ -208,48 +208,14 @@ class DatabaseServer:
 
         return {"status": "success", "users": users}
 
+    # method for save recipe
     @staticmethod
-    def save_recipe(recipe_data):                                 # it's needed to update
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    def save_recipe(recipe_data):
         try:
-            if not all(key in recipe_data for key in ['image_name', 'image_data']):
-                return {"status": "error", "message": "Missing image data"}
-            os.makedirs("recipe_images", exist_ok=True)
-            image_data = base64.b64decode(recipe_data['image_data'])
-            ext = os.path.splitext(recipe_data['image_name'])[1]
-            unique_filename = f"{uuid4().hex}{ext}"
-            image_path = os.path.join("recipe_images", unique_filename)
-            with open(image_path, 'wb') as img_file:
-                img_file.write(image_data)
-            cursor.execute("""
-                INSERT INTO recipes (
-                    author_name, recipe_name, description, 
-                    cooking_time, products, picture_path, confirmed
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                recipe_data['author_name'],
-                recipe_data['recipe_name'],
-                recipe_data['description'],
-                recipe_data['cooking_time'],
-                recipe_data['products'],
-                unique_filename,
-                int(recipe_data.get('confirmed', False))
-            ))
-            db.commit()
-            return {
-                "status": "success",
-                "recipe_id": cursor.lastrowid,
-                "message": "Recipe saved successfully"
-            }
+            recipe_service.create(recipe_data)
+            return {"status": "success"}
         except Exception as e:
-            db.rollback()
-            return {
-                "status": "error",
-                "message": f"Error saving recipe: {str(e)}"
-            }
-        finally:
-            db.close()
+            return {"status": "error", "message": str(e)}
 
     # static method for update recipe
     @staticmethod
@@ -275,31 +241,21 @@ class DatabaseServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    def activate_user(self, user_id):                        # It's needed to update
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    @staticmethod
+    def activate_user(user_id):
         try:
-            cursor.execute("UPDATE users SET authorized = 1 WHERE id = ?", (user_id,))
-            db.commit()
+            user_service.activate(user_id)
             return {"status": "success"}
-        except sqlite3.Error as e:
-            db.rollback()
+        except Exception as e:
             return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
 
-    def deactivate_user(self, user_id):                      # It's needed to update
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    @staticmethod
+    def deactivate_user(user_id):
         try:
-            cursor.execute("UPDATE users SET authorized = 0 WHERE id = ?", (user_id,))
-            db.commit()
+            user_service.activate(user_id, False)
             return {"status": "success"}
-        except sqlite3.Error as e:
-            db.rollback()
+        except Exception as e:
             return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
 
     def confirm_recipe(self, recipe_id):                       # It's needed to update
         db = sqlite3.connect('database.db')
@@ -337,13 +293,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(*(DatabaseServer.load_recipes(False)['recipes']), sep='\n')
-    print(DatabaseServer.update_recipe(by_admin=False, recipe_data={
-        'id': 4,
-        'name': 'test4_updated',
-        'description': 'test4_updated',
-        'cooking_time': 4,
-        'picture_path': 'updated',
-        'confirmed': 3,
-        'user_id': 8
-    }))
+    print(DatabaseServer.activate_user(7))
