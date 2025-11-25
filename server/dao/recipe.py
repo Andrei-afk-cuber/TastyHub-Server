@@ -31,6 +31,16 @@ class RecipeDAO:
 
         return self.session.query(Recipe).all()
 
+    # method for confirm recipe
+    def confirm(self, id: int, confirm: bool = True) -> None:
+        recipe = self.get_one(id)
+        if not recipe:
+            raise Exception('Recipe not found')
+
+        recipe.confirmed = confirm
+        self.session.commit()
+
+
     # method for update data
     def update(self, new_recipe_data: dict) -> None:
         recipe = self.session.query(Recipe).get(new_recipe_data['id'])
