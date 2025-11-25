@@ -37,7 +37,7 @@ class RecipeDAO:
         if not recipe:
             raise Exception('Recipe not found')
 
-        recipe.confirmed = confirm
+        recipe.confirmed = int(confirm)
         self.session.commit()
 
 
