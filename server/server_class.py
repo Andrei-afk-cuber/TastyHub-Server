@@ -261,14 +261,23 @@ class DatabaseServer:
     def confirm_recipe(recipe_id):
         try:
             recipe_service.confirm(recipe_id)
+            return {"status": "success"}
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    # def confirm_recipe(self, recipe_id):                       # It's needed to update
+    @staticmethod
+    def grant_admin_privileges(user_id):
+        try:
+            user_service.grant_admin(user_id)
+            return {"status": "success"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+    # def grant_admin_privileges(self, user_id):                    # It's needed to update
     #     db = sqlite3.connect('database.db')
     #     cursor = db.cursor()
     #     try:
-    #         cursor.execute("UPDATE recipes SET confirmed = 1 WHERE id = ?", (recipe_id,))
+    #         cursor.execute("UPDATE users SET admin = 1, authorized = 1 WHERE id = ?", (user_id,))
     #         db.commit()
     #         return {"status": "success"}
     #     except sqlite3.Error as e:
@@ -276,19 +285,6 @@ class DatabaseServer:
     #         return {"status": "error", "message": str(e)}
     #     finally:
     #         db.close()
-
-    def grant_admin_privileges(self, user_id):                    # It's needed to update
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
-        try:
-            cursor.execute("UPDATE users SET admin = 1, authorized = 1 WHERE id = ?", (user_id,))
-            db.commit()
-            return {"status": "success"}
-        except sqlite3.Error as e:
-            db.rollback()
-            return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
 
     @staticmethod
     def delete_user(user_id: int) -> dict:
@@ -300,4 +296,5 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.activate_user(7))
+    print(DatabaseServer.grant_admin_privileges(6))
+    print(*DatabaseServer.load_users()['users'], sep="\n")
