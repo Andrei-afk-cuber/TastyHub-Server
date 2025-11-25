@@ -70,6 +70,11 @@ class RecipeService:
 
         return result
 
+    # method for confirm recipe
+    def confirm(self, recipe_id, confirm=True):
+        with self.factory_dao.recipe_dao() as dao:
+            dao.confirm(recipe_id, confirm)
+
     # method for update recipe
     def update(self, recipe_data: dict, by_admin: bool = False) -> None:
         if not by_admin:
