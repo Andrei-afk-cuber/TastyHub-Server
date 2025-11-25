@@ -257,18 +257,25 @@ class DatabaseServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    def confirm_recipe(self, recipe_id):                       # It's needed to update
-        db = sqlite3.connect('database.db')
-        cursor = db.cursor()
+    @staticmethod
+    def confirm_recipe(recipe_id):
         try:
-            cursor.execute("UPDATE recipes SET confirmed = 1 WHERE id = ?", (recipe_id,))
-            db.commit()
-            return {"status": "success"}
-        except sqlite3.Error as e:
-            db.rollback()
+            recipe_service.confirm(recipe_id)
+        except Exception as e:
             return {"status": "error", "message": str(e)}
-        finally:
-            db.close()
+
+    # def confirm_recipe(self, recipe_id):                       # It's needed to update
+    #     db = sqlite3.connect('database.db')
+    #     cursor = db.cursor()
+    #     try:
+    #         cursor.execute("UPDATE recipes SET confirmed = 1 WHERE id = ?", (recipe_id,))
+    #         db.commit()
+    #         return {"status": "success"}
+    #     except sqlite3.Error as e:
+    #         db.rollback()
+    #         return {"status": "error", "message": str(e)}
+    #     finally:
+    #         db.close()
 
     def grant_admin_privileges(self, user_id):                    # It's needed to update
         db = sqlite3.connect('database.db')
