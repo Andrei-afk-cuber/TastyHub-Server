@@ -76,6 +76,11 @@ class UserService:
         with self.factory_dao.user_dao() as dao:
             dao.activate(user_id, activate)
 
+    # service method for grant admin privileges
+    def grant_admin(self, user_id: int, grant=True) -> None:
+        with self.factory_dao.user_dao() as dao:
+            dao.grant_admin(user_id, grant)
+
     # service method for delete user
     def delete(self, id: int) -> None:
         with self.factory_dao.user_dao() as dao:
