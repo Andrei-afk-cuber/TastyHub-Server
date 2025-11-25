@@ -273,19 +273,6 @@ class DatabaseServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    # def grant_admin_privileges(self, user_id):                    # It's needed to update
-    #     db = sqlite3.connect('database.db')
-    #     cursor = db.cursor()
-    #     try:
-    #         cursor.execute("UPDATE users SET admin = 1, authorized = 1 WHERE id = ?", (user_id,))
-    #         db.commit()
-    #         return {"status": "success"}
-    #     except sqlite3.Error as e:
-    #         db.rollback()
-    #         return {"status": "error", "message": str(e)}
-    #     finally:
-    #         db.close()
-
     @staticmethod
     def delete_user(user_id: int) -> dict:
         try:
