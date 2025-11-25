@@ -46,6 +46,12 @@ class UserDAO:
         user.authorized = int(activate)
         self.session.commit()
 
+    # method for grant admin privileges
+    def grant_admin(self, id, grant=True):
+        user = self.get_one(id)
+        user.admin = int(grant)
+        self.session.commit()
+
     # method for delete object
     def delete(self, id):
         user = self.get_one(id)
