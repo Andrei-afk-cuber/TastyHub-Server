@@ -51,11 +51,35 @@ class RecipeService:
 
         return result
 
+    def get_by_ingredients(self, ingredients: List[str]) -> List[dict]:
+        result = []
+        with self.factory_dao.recipe_dao() as dao:
+            recipes = dao.get_by_ingredients(ingredients)
+
+            if not recipes:
+                raise Exception('No recipes found')
+
+            for recipe in recipes:
+                result.append({
+                    'id': recipe.id,
+                    'name': recipe.name,
+                    'description': recipe.description,
+                    'cooking_time': recipe.cooking_time,
+                    'picture_path': recipe.picture_path,
+                    'confirmed': recipe.confirmed,
+                    'user_id': recipe.user_id
+                })
+
+        return result
+
     # method for get all recipes
     def get_all(self, only_confirmed=True):
         result = []
         with self.factory_dao.recipe_dao() as dao:
             recipes = dao.get_all(only_confirmed=only_confirmed)
+
+            if not recipes:
+                raise Exception('No recipes found')
 
             for recipe in recipes:
                 result.append({

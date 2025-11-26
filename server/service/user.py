@@ -99,9 +99,4 @@ class UserService:
         return base64.b64encode(hash_digest)
 
 if __name__ == "__main__":
-    factory = DAOFactory()
-    service = UserService(factory)
-    print(UserService.get_by_username(service, username="admin"))
-    print(UserService.get_one(service, id=1))
-    print(UserService.get_one(service, id=2))
-    print(UserService.get_all(service))
+    print(UserService.get_password_hash('BhuBhu123'))

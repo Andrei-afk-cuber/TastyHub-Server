@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from sqlalchemy.orm import Session
 
-from server.dao.models.main import Recipe
+from server.dao.models.main import Recipe, Product
 
 # dao for recipe model
 class RecipeDAO:
@@ -24,8 +24,12 @@ class RecipeDAO:
     def get_by_name(self, name: str) -> List:
         return self.session.query(Recipe).filter(Recipe.name.lower.like(f'%{name}%'), Recipe.confirmed == 1).all()
 
+    # method for get recipe by ingredients
+    def get_by_ingredients(self, ingredients: List[str]) -> List:
+        return self.session.query(Recipe).join(Recipe.products).filter(Product.name.in_(ingredients)).all()
+
     # method for get all objects from database
-    def get_all(self, only_confirmed=True) -> List[Recipe]:
+    def get_all(self, only_confirmed: bool=True) -> List[Recipe]:
         if only_confirmed:
             return self.session.query(Recipe).filter(Recipe.confirmed == 1).all()
 
