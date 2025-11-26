@@ -1,16 +1,17 @@
+# importing the necessary libraries
 import socket
-import sqlite3
 import threading
 import json
 import os
-import base64
-from uuid import uuid4
 
-from server.containers import user_service, user_schema, recipe_service, recipes_schema, recipe_schema
+from typing import Optional, List
+
+# importing my own services and schemas
+from server.containers import user_service, user_schema, recipe_service
 
 # server class
 class DatabaseServer:
-    def __init__(self, host='0.0.0.0', port=65432):
+    def __init__(self, host: str ='0.0.0.0', port: int =65432) -> None:
         self.host = host
         self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,7 +23,7 @@ class DatabaseServer:
     def setup_database(self):
         pass
 
-    def handle_client(self, conn, addr):
+    def handle_client(self, conn, addr) -> None:
         print(f"Connected by {addr}")
         try:
             data = ""
@@ -53,7 +54,8 @@ class DatabaseServer:
             conn.close()
             print(f"Connection with {addr} closed")
 
-    def process_request(self, request):
+
+    def process_request(self, request: dict) -> dict:
         action = request.get('action')
         if action == 'check_login':
             username = request.get('username')
@@ -120,7 +122,7 @@ class DatabaseServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    def start(self):
+    def start(self) -> None:
         self.setup_database()
         print("Server is running and waiting for connections...")
         while True:
@@ -130,7 +132,7 @@ class DatabaseServer:
 
     # static method for load recipes
     @staticmethod
-    def load_recipes(only_confirmed=True, by_name=None, by_ingredients=None):      # update this method finally
+    def load_recipes(only_confirmed: bool =True, by_name: Optional[str] =None, by_ingredients: Optional[List[str]] =None) -> dict:
         recipes = None
 
         if by_name:
@@ -147,7 +149,7 @@ class DatabaseServer:
         return {"status": "success", "recipes": recipes}
 
     @staticmethod
-    def load_users():
+    def load_users() -> dict:
         users = user_service.get_all()
         if not users:
             return {"status": "error", "message": "No users found"}
@@ -156,7 +158,7 @@ class DatabaseServer:
 
     # method for save recipe
     @staticmethod
-    def save_recipe(recipe_data):
+    def save_recipe(recipe_data: dict) -> dict:
         try:
             recipe_service.create(recipe_data)
             return {"status": "success"}
@@ -165,7 +167,7 @@ class DatabaseServer:
 
     # static method for update recipe
     @staticmethod
-    def update_recipe(recipe_data, by_admin=False):
+    def update_recipe(recipe_data: dict, by_admin: bool =False) -> dict:
         try:
             recipe_service.update(recipe_data, by_admin)
             return {"status": "success"}
@@ -174,7 +176,7 @@ class DatabaseServer:
 
     # static method for delete recipe
     @staticmethod
-    def delete_recipe(recipe_id):
+    def delete_recipe(recipe_id: int) -> dict:
         try:
             recipe = recipe_service.get_one(recipe_id)
 
@@ -188,7 +190,7 @@ class DatabaseServer:
             return {"status": "error", "message": str(e)}
 
     @staticmethod
-    def activate_user(user_id):
+    def activate_user(user_id: int) -> dict:
         try:
             user_service.activate(user_id)
             return {"status": "success"}
@@ -196,7 +198,7 @@ class DatabaseServer:
             return {"status": "error", "message": str(e)}
 
     @staticmethod
-    def deactivate_user(user_id):
+    def deactivate_user(user_id: int) -> dict:
         try:
             user_service.activate(user_id, False)
             return {"status": "success"}
@@ -204,7 +206,7 @@ class DatabaseServer:
             return {"status": "error", "message": str(e)}
 
     @staticmethod
-    def confirm_recipe(recipe_id):
+    def confirm_recipe(recipe_id: int) -> dict:
         try:
             recipe_service.confirm(recipe_id)
             return {"status": "success"}
@@ -212,7 +214,7 @@ class DatabaseServer:
             return {"status": "error", "message": str(e)}
 
     @staticmethod
-    def grant_admin_privileges(user_id):
+    def grant_admin_privileges(user_id: int) -> dict:
         try:
             user_service.grant_admin(user_id)
             return {"status": "success"}
