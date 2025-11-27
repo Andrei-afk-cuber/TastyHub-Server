@@ -19,10 +19,6 @@ class DatabaseServer:
         self.server_socket.listen()
         print(f"Server started on {self.host}:{self.port}")
 
-    # method for create database
-    def setup_database(self):
-        pass
-
     def handle_client(self, conn, addr) -> None:
         print(f"Connected by {addr}")
         try:
@@ -123,7 +119,6 @@ class DatabaseServer:
             return {"status": "error", "message": str(e)}
 
     def start(self) -> None:
-        self.setup_database()
         print("Server is running and waiting for connections...")
         while True:
             conn, addr = self.server_socket.accept()
