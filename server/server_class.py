@@ -107,7 +107,7 @@ class DatabaseServer:
         if user['password'] != user_service.get_password_hash(password):
             return {"status": "error", "message": "Incorrect password"}
 
-        return user_schema.dump(user)
+        return {"status":"success", "user": user_schema.dump(user)}
 
     # static method for create new user
     @staticmethod
@@ -136,6 +136,8 @@ class DatabaseServer:
             recipes = recipe_service.get_by_ingredients(by_ingredients)
         else:
             recipes = recipe_service.get_all(only_confirmed)
+
+        print(recipes)
 
         # check: is recipes empty?
         if not recipes:
@@ -226,5 +228,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.grant_admin_privileges(6))
-    print(*DatabaseServer.load_users()['users'], sep="\n")
+    print(DatabaseServer.load_recipes())

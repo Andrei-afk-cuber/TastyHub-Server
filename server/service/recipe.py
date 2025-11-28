@@ -37,7 +37,6 @@ class RecipeService:
                         'user_name': user.name,
                         'products': [product.name for product in recipe.products]
                     }
-            recipe = dao.get_one(id)
 
     # method for get recipe by name
     def get_by_name(self, name: str) -> list:
@@ -91,6 +90,9 @@ class RecipeService:
                 raise Exception('No recipes found')
 
             for recipe in recipes:
+                with self.factory_dao.user_dao() as user_dao:
+                    username = user_dao.get_one(recipe.user_id).username
+
                 result.append({
                     'id': recipe.id,
                     'name': recipe.name,
@@ -98,7 +100,7 @@ class RecipeService:
                     'cooking_time': recipe.cooking_time,
                     'picture_path': recipe.picture_path,
                     'confirmed': recipe.confirmed,
-                    'user_id': recipe.user_id,
+                    'user_name': username,
                     'products': [product.name for product in recipe.products]
                 })
 
