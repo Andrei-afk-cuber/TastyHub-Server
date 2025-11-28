@@ -3,6 +3,9 @@ from typing import List
 from server.dao.models.main import Recipe
 from server.dao.factory import DAOFactory
 
+# temp import
+from server.service.schemas.main import RecipeSchema
+
 # recipe service-class
 class RecipeService:
     def __init__(self, factory_dao: DAOFactory) -> None:
@@ -21,6 +24,8 @@ class RecipeService:
     def get_one(self, id: int) -> dict:
         with self.factory_dao.recipe_dao() as dao:
             recipe = dao.get_one(id)
+            with self.factory_dao.user_dao() as user_dao:
+                user = dao.get_one(recipe.user_id)
 
             return {
                         'id': recipe.id,
@@ -29,8 +34,10 @@ class RecipeService:
                         'cooking_time': recipe.cooking_time,
                         'picture_path': recipe.picture_path,
                         'confirmed': recipe.confirmed,
-                        'user_id': recipe.user_id
+                        'user_name': user.name,
+                        'products': [product.name for product in recipe.products]
                     }
+            recipe = dao.get_one(id)
 
     # method for get recipe by name
     def get_by_name(self, name: str) -> list:
@@ -46,7 +53,8 @@ class RecipeService:
                     'cooking_time': recipe.cooking_time,
                     'picture_path': recipe.picture_path,
                     'confirmed': recipe.confirmed,
-                    'user_id': recipe.user_id
+                    'user_id': recipe.user_id,
+                    'products': [product.name for product in recipe.products]
                 })
 
         return result
@@ -67,7 +75,8 @@ class RecipeService:
                     'cooking_time': recipe.cooking_time,
                     'picture_path': recipe.picture_path,
                     'confirmed': recipe.confirmed,
-                    'user_id': recipe.user_id
+                    'user_id': recipe.user_id,
+                    'products': [product.name for product in recipe.products]
                 })
 
         return result
@@ -89,7 +98,8 @@ class RecipeService:
                     'cooking_time': recipe.cooking_time,
                     'picture_path': recipe.picture_path,
                     'confirmed': recipe.confirmed,
-                    'user_id': recipe.user_id
+                    'user_id': recipe.user_id,
+                    'products': [product.name for product in recipe.products]
                 })
 
         return result
@@ -116,4 +126,4 @@ class RecipeService:
 if __name__ == '__main__':
     factory = DAOFactory()
     service = RecipeService(factory)
-    print(RecipeService.get_all(service))
+    print(service.get_one(1))
