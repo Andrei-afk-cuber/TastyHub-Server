@@ -129,21 +129,18 @@ class DatabaseServer:
     @staticmethod
     def load_recipes(only_confirmed: bool =True, by_name: Optional[str] =None, by_ingredients: Optional[List[str]] =None) -> dict:
         recipes = None
+        try:
+            if by_name:
+                recipes = recipe_service.get_by_name(by_name.lower())
+            elif by_ingredients:
+                recipes = recipe_service.get_by_ingredients(by_ingredients)
+            else:
+                recipes = recipe_service.get_all(only_confirmed)
 
-        if by_name:
-            recipes = recipe_service.get_by_name(by_name.lower())
-        elif by_ingredients:
-            recipes = recipe_service.get_by_ingredients(by_ingredients)
-        else:
-            recipes = recipe_service.get_all(only_confirmed)
+            return {"status": "success", "recipes": recipes}
 
-        print(recipes)
-
-        # check: is recipes empty?
-        if not recipes:
-            return {"status": "error", "message": "No recipes found"}
-
-        return {"status": "success", "recipes": recipes}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
 
     @staticmethod
     def load_users() -> dict:
@@ -157,6 +154,7 @@ class DatabaseServer:
     @staticmethod
     def save_recipe(recipe_data: dict) -> dict:
         try:
+            print(recipe_data)
             recipe_service.create(recipe_data)
             return {"status": "success"}
         except Exception as e:
