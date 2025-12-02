@@ -228,4 +228,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(len(DatabaseServer.load_recipes(by_username='developer')['recipes']))
+    print(DatabaseServer.load_recipes(by_name='кот'))

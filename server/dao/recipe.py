@@ -24,7 +24,7 @@ class RecipeDAO:
 
     # method for get recipe by name
     def get_by_name(self, name: str) -> List:
-        return self.session.query(Recipe).filter(Recipe.name.lower.like(f'%{name}%'), Recipe.confirmed == 1).all()
+        return self.session.query(Recipe).filter(Recipe.name.like(f'%{name}%'), Recipe.confirmed == 1).all()
 
     # method for get recipe by ingredients
     def get_by_ingredients(self, ingredients: List[str]) -> List:

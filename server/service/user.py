@@ -41,14 +41,16 @@ class UserService:
     def get_by_username(self, username: str) -> dict:
         with self.factory_dao.user_dao() as dao:
             user = dao.get_by_username(username)
+            if user:
+                return {
+                    'id':user.id,
+                    'username':user.username,
+                    'password':user.password,
+                    'admin':user.admin,
+                    'authorized':user.authorized,
+                }
 
-            return {
-                'id':user.id,
-                'username':user.username,
-                'password':user.password,
-                'admin':user.admin,
-                'authorized':user.authorized,
-            }
+            return user
 
     # service method for get all users
     def get_all(self) -> List[dict]:

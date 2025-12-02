@@ -89,16 +89,19 @@ class RecipeService:
             recipes = dao.get_by_name(name)
 
             for recipe in recipes:
-                result.append({
-                    'id': recipe.id,
-                    'name': recipe.name,
-                    'description': recipe.description,
-                    'cooking_time': recipe.cooking_time,
-                    'picture_path': recipe.picture_path,
-                    'confirmed': recipe.confirmed,
-                    'user_id': recipe.user_id,
-                    'products': [product.name for product in recipe.products]
-                })
+                with self.factory_dao.user_dao() as user_dao:
+                    user = user_dao.get_one(recipe.user_id)
+
+                    result.append({
+                                'id': recipe.id,
+                                'name': recipe.name,
+                                'description': recipe.description,
+                                'cooking_time': recipe.cooking_time,
+                                'picture_path': recipe.picture_path,
+                                'confirmed': recipe.confirmed,
+                                'user_name': user.username,
+                                'products': [product.name for product in recipe.products]
+                            })
 
         return result
 
