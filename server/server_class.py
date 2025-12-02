@@ -154,11 +154,10 @@ class DatabaseServer:
     @staticmethod
     def save_recipe(recipe_data: dict) -> dict:
         try:
-            print(recipe_data)
             recipe_service.create(recipe_data)
             return {"status": "success"}
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": "save_recipe method error: " + str(e)}
 
     # static method for update recipe
     @staticmethod
@@ -226,4 +225,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.load_recipes())
+    print(DatabaseServer.load_recipes(only_confirmed=False))

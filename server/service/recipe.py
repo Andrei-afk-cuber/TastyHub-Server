@@ -1,20 +1,45 @@
 from typing import List
 
-from server.dao.models.main import Recipe
+from server.dao.models.main import Recipe, Product
 from server.dao.factory import DAOFactory
-
-# temp import
-from server.service.schemas.main import RecipeSchema
 
 # recipe service-class
 class RecipeService:
     def __init__(self, factory_dao: DAOFactory) -> None:
         self.factory_dao = factory_dao
 
-    # method for create recipe
+    # method for create recipe (long method smell)
     def create(self, product_data: dict) -> Recipe:
+        image_data = product_data.pop('image_data')
+        username = product_data.pop('user_name')
+
+        with self.factory_dao.user_dao() as user_dao:
+            user = user_dao.get_by_username(username)
+            user_id = user.id
+
+        product_data['user_id'] = user_id
+        products=product_data.pop('products')
+
+        # transform products for adding with relationships
+        result_products = []
+
+        for product in products:
+            with self.factory_dao.product_dao() as product_dao:
+                new_product = product_dao.get_by_name(product)
+
+            if not new_product:
+                product_obj = Product(**{'name': product})
+
+                with self.factory_dao.product_dao() as product_dao:
+                    product_dao.create(product_obj)
+                    new_product = product_dao.get_by_name(product)
+
+            result_products.append(new_product)
+
+
+        product_data['products'] = result_products
+
         with self.factory_dao.recipe_dao() as dao:
-            product_data['confirmed'] = 0
             recipe = Recipe(**product_data)
             dao.create(recipe)
 

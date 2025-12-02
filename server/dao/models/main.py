@@ -68,19 +68,17 @@ if __name__ == "__main__":
         authorized = 1
     )
 
+    p1 = Product(name='cheese')
+    p2 = Product(name='cheese2')
+
     recipe = Recipe(
         name = "test",
         description = "test",
         cooking_time = 1,
         picture_path = "test",
         confirmed = 1,
-        user_id = 1
+        user_id = 1,
+        products = [p1, p2]
     )
 
-    product = Product(
-        name="Test"
-    )
-
-    print(user)
-    print(recipe)
-    print(product)
+    print(recipe.products)
