@@ -51,16 +51,16 @@ class RecipeService:
             recipe = dao.get_one(id)
             with self.factory_dao.user_dao() as user_dao:
                 user = user_dao.get_one(recipe.user_id)
-            return {
-                        'id': recipe.id,
-                        'name': recipe.name,
-                        'description': recipe.description,
-                        'cooking_time': recipe.cooking_time,
-                        'picture_path': recipe.picture_path,
-                        'confirmed': recipe.confirmed,
-                        'user_name': user['username'],
-                        'products': [product.name for product in recipe.products]
-                    }
+                return {
+                            'id': recipe.id,
+                            'name': recipe.name,
+                            'description': recipe.description,
+                            'cooking_time': recipe.cooking_time,
+                            'picture_path': recipe.picture_path,
+                            'confirmed': recipe.confirmed,
+                            'user_name': user.username,
+                            'products': [product.name for product in recipe.products]
+                        }
 
     # method for get recipe by name
     def get_by_username(self, username: str) -> list:
