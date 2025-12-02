@@ -77,7 +77,7 @@ class RecipeService:
                     'cooking_time': recipe.cooking_time,
                     'picture_path': recipe.picture_path,
                     'confirmed': recipe.confirmed,
-                    'user_id': recipe.user_id,
+                    'user_name': username,
                     'products': [product.name for product in recipe.products]
                 })
 

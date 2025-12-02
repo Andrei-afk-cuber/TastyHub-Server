@@ -69,7 +69,8 @@ class DatabaseServer:
             by_author = request.get('by_author', None)
             by_name = request.get('by_name', None)
             by_ingredients = request.get('by_ingredients', None)
-            return self.load_recipes(only_confirmed, by_name, by_ingredients)
+            by_username = request.get('by_username', None)
+            return self.load_recipes(only_confirmed, by_name, by_username, by_ingredients)
         elif action == 'activate_user':
             user_id = request.get('user_id')
             return self.activate_user(user_id)
