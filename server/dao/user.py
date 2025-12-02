@@ -15,7 +15,15 @@ class UserDAO:
 
     # method for get one object from database by id
     def get_one(self, id):
-        return self.session.query(User).get(id)
+        user = self.session.query(User).get(id)
+
+        return {
+            'id': user.id,
+            'username': user.username,
+            'password': user.password,
+            'admin': user.admin,
+            'authorized': user.authorized,
+        }
 
     # method for get all objects from database
     def get_all(self):

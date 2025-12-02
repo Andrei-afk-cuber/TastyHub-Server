@@ -50,8 +50,7 @@ class RecipeService:
         with self.factory_dao.recipe_dao() as dao:
             recipe = dao.get_one(id)
             with self.factory_dao.user_dao() as user_dao:
-                user = dao.get_one(recipe.user_id)
-
+                user = user_dao.get_one(recipe.user_id)
             return {
                         'id': recipe.id,
                         'name': recipe.name,
@@ -59,7 +58,7 @@ class RecipeService:
                         'cooking_time': recipe.cooking_time,
                         'picture_path': recipe.picture_path,
                         'confirmed': recipe.confirmed,
-                        'user_name': user.name,
+                        'user_name': user['username'],
                         'products': [product.name for product in recipe.products]
                     }
 
