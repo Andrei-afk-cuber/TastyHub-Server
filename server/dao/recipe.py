@@ -2,9 +2,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from sqlalchemy.orm import Session
-
-from server.dao.models.main import Recipe, Product
+from server.dao.models.main import Recipe, Product, User
 
 # dao for recipe model
 class RecipeDAO:
@@ -19,6 +17,10 @@ class RecipeDAO:
     # method for get one object from database by id
     def get_one(self, id: int) -> Optional[Recipe]:
         return self.session.query(Recipe).get(id)
+
+    # method for get recipe by name
+    def get_by_username(self, username: str) -> List:
+        return self.session.query(Recipe).join(User.recipes).filter(User.username == username).all()
 
     # method for get recipe by name
     def get_by_name(self, name: str) -> List:

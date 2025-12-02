@@ -127,13 +127,15 @@ class DatabaseServer:
 
     # static method for load recipes
     @staticmethod
-    def load_recipes(only_confirmed: bool =True, by_name: Optional[str] =None, by_ingredients: Optional[List[str]] =None) -> dict:
+    def load_recipes(only_confirmed: bool =True, by_name: Optional[str] =None, by_username: Optional[str] =None, by_ingredients: Optional[List[str]] =None) -> dict:
         recipes = None
         try:
             if by_name:
                 recipes = recipe_service.get_by_name(by_name.lower())
             elif by_ingredients:
                 recipes = recipe_service.get_by_ingredients(by_ingredients)
+            elif by_username:
+                recipes = recipe_service.get_by_username(by_username)
             else:
                 recipes = recipe_service.get_all(only_confirmed)
 
@@ -225,4 +227,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.load_recipes(only_confirmed=False))
+    print(len(DatabaseServer.load_recipes(by_username='developer')['recipes']))
