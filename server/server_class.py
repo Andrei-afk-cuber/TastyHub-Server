@@ -228,4 +228,4 @@ class DatabaseServer:
 
 # debugger run
 if __name__ == "__main__":
-    print(DatabaseServer.load_recipes(by_ingredients=['каша', 'фарш', 'лук']))
+    print(DatabaseServer.load_recipes())
