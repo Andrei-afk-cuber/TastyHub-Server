@@ -1,15 +1,21 @@
+import base64
+import io
+from PIL import Image
 from typing import List
+from pathlib import Path
 
 from server.dao.models.main import Recipe, Product
 from server.dao.factory import DAOFactory
+from server.config import IMAGE_PATH
 
 # recipe service-class
 class RecipeService:
     def __init__(self, factory_dao: DAOFactory) -> None:
         self.factory_dao = factory_dao
 
-    # method for create recipe (long method smell)
+    # method for create recipe
     def create(self, product_data: dict) -> Recipe:
+        self._save_recipe_image(product_data)
         image_data = product_data.pop('image_data')
         username = product_data.pop('user_name')
 
@@ -173,6 +179,50 @@ class RecipeService:
     def delete(self, id: int) -> None:
         with self.factory_dao.recipe_dao() as dao:
             dao.delete(id)
+
+    # method for save image
+    @staticmethod
+    def _save_recipe_image(recipe_data: dict) -> str:
+        try:
+            if 'image_data' not in recipe_data:
+                raise ValueError('image_data is not exists in recipe_data')
+
+            if 'picture_path' not in recipe_data:
+                raise ValueError('picture_path is not exists in recipe_data')
+
+            image_data = recipe_data['image_data']
+            picture_path = recipe_data['picture_path']
+
+            if not image_data:
+                raise ValueError('image_data is empty')
+
+            if not picture_path:
+                raise ValueError('picture_path is empty')
+
+            filename = Path(picture_path).name
+            save_path = IMAGE_PATH / filename
+
+            image_bytes = base64.b64decode(image_data)
+            image = Image.open(io.BytesIO(image_bytes))
+
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+
+            max_size = (800, 800)
+            if image.size[0] > max_size[0] or image.size[1] > max_size[1]:
+                image.thumbnail(max_size, Image.LANCZOS)
+
+            image.save(save_path, format="JPEG", quality=85, optimize=True)
+
+            if not save_path.exists():
+                raise IOError(f'save path {save_path} does not exist')
+
+            return filename
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+
 
 # debugger run
 if __name__ == '__main__':
