@@ -61,7 +61,7 @@ class UserService:
                 result.append({
                     'id': user.id,
                     'username': user.username,
-                    'password': user.password,
+                    'password': user.password.decode('utf-8'),
                     'admin': user.admin,
                     'authorized': user.authorized
                 })
