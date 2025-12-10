@@ -149,7 +149,7 @@ class RecipeService:
             for recipe in recipes:
                 with self.factory_dao.user_dao() as user_dao:
                     username = user_dao.get_one(recipe.user_id).username
-                image_data = self._convert_image_ro_bytes(recipe)
+                image_data = self._convert_image_to_bytes(recipe)
                 result.append({
                     'id': recipe.id,
                     'name': recipe.name,
@@ -224,7 +224,7 @@ class RecipeService:
         except Exception as e:
             print(f"Error: {e}")
 
-    def _convert_image_ro_bytes(self, recipe: Recipe) -> bytes:
+    def _convert_image_to_bytes(self, recipe: Recipe) -> bytes:
         image_filename = recipe.picture_path
 
         project_root = Path.cwd()
@@ -232,8 +232,7 @@ class RecipeService:
         image_path = image_dir / image_filename
 
         if not os.path.exists(image_path):
-            print(f"Image path {image_path} does not exist")
-            return "no image"
+            os.mkdir(image_dir)
 
         img = Image.open(image_path)
         max_size = (800, 800)
