@@ -3,11 +3,14 @@ import socket
 import threading
 import json
 import os
-
 from typing import Optional, List
+import logging
 
 # importing my own services and schemas
 from server.containers import user_service, user_schema, recipe_service
+
+# set up logger
+logging.basicConfig(level=logging.INFO, filename='server.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # server class
 class DatabaseServer:
@@ -56,12 +59,15 @@ class DatabaseServer:
         if action == 'check_login':
             username = request.get('username')
             password = request.get('password')
+            logging.info(f"Checking {username} and {password}")
             return self.check_login(username, password)
         elif action == 'register_user':
             username = request.get('username')
             password = request.get('password')
+            logging.info(f"Registering {username} and {password}")
             return self.register_user(username, password)
         elif action == 'load_users':
+            logging.info(f"Loading all users")
             return self.load_users()
         elif action == 'load_recipes':
             only_confirmed = request.get('only_confirmed', False)
@@ -70,33 +76,43 @@ class DatabaseServer:
             by_name = request.get('by_name', None)
             by_ingredients = request.get('by_ingredients', None)
             by_username = request.get('by_username', None)
+            logging.info(f"Loading recipes")
             return self.load_recipes(only_confirmed, by_name, by_username, by_ingredients)
         elif action == 'activate_user':
             user_id = request.get('user_id')
+            logging.info(f"Activating user by id:{user_id}")
             return self.activate_user(user_id)
         elif action == 'deactivate_user':
             user_id = request.get('user_id')
+            logging.info(f"Deactivating user by id:{user_id}")
             return self.deactivate_user(user_id)
         elif action == 'confirm_recipe':
             recipe_id = request.get('recipe_id')
+            logging.info(f"Confirming recipe by id:{recipe_id}")
             return self.confirm_recipe(recipe_id)
         elif action == 'delete_recipe':
             recipe_id = request.get('recipe_id')
+            logging.info(f"Deleting recipe by id:{recipe_id}")
             return self.delete_recipe(recipe_id)
         elif action == 'save_recipe':
             recipe_data = request.get('recipe_data')
+            logging.info(f"Saving recipe data by id:{recipe_data.get('id', None)}")
             return self.save_recipe(recipe_data)
         elif action == 'update_recipe':
             recipe_data = request.get('recipe_data')
             by_admin = request.get('by_admin', False)
+            logging.info(f"Updating recipe by id:{recipe_data.get('id', None)}")
             return self.update_recipe(recipe_data, by_admin)
         elif action == 'grant_admin_privileges':
             user_id = request.get('user_id')
+            logging.info(f"Granting admin's privileges by id:{user_id}")
             return self.grant_admin_privileges(user_id)
         elif action == 'delete_user':
             user_id = request.get('user_id')
+            logging.info(f"Deleting user by id:{user_id}")
             return self.delete_user(user_id)
         else:
+            logging.error(f"Unknown action: {action}")
             return {"status": "error", "message": "Unknown action"}
 
     # method for check user login
@@ -104,8 +120,10 @@ class DatabaseServer:
     def check_login(username: str, password: str) -> dict:
         user = user_service.get_by_username(username)
         if not user:
+            logging.exception("User not found")
             return {"status": "error", "message": "User not found"}
         if user['password'] != user_service.get_password_hash(password):
+            logging.exception("Wrong password")
             return {"status": "error", "message": "Incorrect password"}
 
         return {"status":"success", "user": user_schema.dump(user)}
@@ -117,6 +135,7 @@ class DatabaseServer:
             user_service.create(user_data={'username': username, 'password': password})
             return {"status": "success", "message": "User created"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     def start(self) -> None:
@@ -139,16 +158,17 @@ class DatabaseServer:
                 recipes = recipe_service.get_by_username(by_username)
             else:
                 recipes = recipe_service.get_all(only_confirmed)
-
             return {"status": "success", "recipes": recipes}
 
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     @staticmethod
     def load_users() -> dict:
         users = user_service.get_all()
         if not users:
+            logging.exception("No users found")
             return {"status": "error", "message": "No users found"}
 
         return {"status": "success", "users": users}
@@ -160,6 +180,7 @@ class DatabaseServer:
             recipe_service.create(recipe_data)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": "save_recipe method error: " + str(e)}
 
     # static method for update recipe
@@ -169,6 +190,7 @@ class DatabaseServer:
             recipe_service.update(recipe_data, by_admin)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     # static method for delete recipe
@@ -184,6 +206,7 @@ class DatabaseServer:
             recipe_service.delete(recipe_id)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     @staticmethod
@@ -192,6 +215,7 @@ class DatabaseServer:
             user_service.activate(user_id)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     @staticmethod
@@ -200,6 +224,7 @@ class DatabaseServer:
             user_service.activate(user_id, False)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     @staticmethod
@@ -208,6 +233,7 @@ class DatabaseServer:
             recipe_service.confirm(recipe_id)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     @staticmethod
@@ -216,6 +242,7 @@ class DatabaseServer:
             user_service.grant_admin(user_id)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": str(e)}
 
     @staticmethod
@@ -224,6 +251,7 @@ class DatabaseServer:
             user_service.delete(user_id)
             return {"status": "success"}
         except Exception as e:
+            logging.exception(e)
             return {"status": "error", "message": "User not found"}
 
 # debugger run

@@ -56,14 +56,17 @@ class RecipeService:
     def get_one(self, id: int) -> dict:
         with self.factory_dao.recipe_dao() as dao:
             recipe = dao.get_one(id)
+            image_data = self._convert_image_to_bytes(recipe)
             with self.factory_dao.user_dao() as user_dao:
                 user = user_dao.get_one(recipe.user_id)
+
                 return {
                             'id': recipe.id,
                             'name': recipe.name,
                             'description': recipe.description,
                             'cooking_time': recipe.cooking_time,
                             'picture_path': recipe.picture_path,
+                            'image_data': image_data,
                             'confirmed': recipe.confirmed,
                             'user_name': user.username,
                             'products': [product.name for product in recipe.products]
@@ -76,12 +79,14 @@ class RecipeService:
             recipes = dao.get_by_username(username)
 
             for recipe in recipes:
+                image_data = self._convert_image_to_bytes(recipe)
                 result.append({
                     'id': recipe.id,
                     'name': recipe.name,
                     'description': recipe.description,
                     'cooking_time': recipe.cooking_time,
                     'picture_path': recipe.picture_path,
+                    'image_data': image_data,
                     'confirmed': recipe.confirmed,
                     'user_name': username,
                     'products': [product.name for product in recipe.products]
@@ -96,6 +101,7 @@ class RecipeService:
             recipes = dao.get_by_name(name)
 
             for recipe in recipes:
+                image_data = self._convert_image_to_bytes(recipe)
                 with self.factory_dao.user_dao() as user_dao:
                     user = user_dao.get_one(recipe.user_id)
 
@@ -105,6 +111,7 @@ class RecipeService:
                                 'description': recipe.description,
                                 'cooking_time': recipe.cooking_time,
                                 'picture_path': recipe.picture_path,
+                                'image_data': image_data,
                                 'confirmed': recipe.confirmed,
                                 'user_name': user.username,
                                 'products': [product.name for product in recipe.products]
