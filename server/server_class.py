@@ -20,19 +20,19 @@ class DatabaseServer:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen()
-        print(f"Server started on {self.host}:{self.port}")
+        logging.info(f"Server started on {self.host}:{self.port}")
 
     def handle_client(self, conn, addr) -> None:
-        print(f"Connected by {addr}")
+        logging.info(f"Connected to {addr}")
         try:
             data = ""
             while True:
                 chunk = conn.recv(4096).decode('utf-8')
                 if not chunk:
-                    print(f"No more data from {addr}")
+                    logging.info(f"No more data from {addr}")
                     break
                 data += chunk
-                print(f"Received chunk of size {len(chunk)} from {addr}")
+                logging.info(f"Received chunk of size {len(chunk)} from {addr}")
                 if data.endswith('}'):
                     break
             if data:
@@ -44,14 +44,14 @@ class DatabaseServer:
                 except json.JSONDecodeError as e:
                     conn.sendall(json.dumps({"status": "error", "message": f"Invalid JSON: {str(e)}"}).encode('utf-8'))
             else:
-                print(f"No data received from {addr}")
+                logging.info(f"No data received from {addr}")
         except ConnectionResetError:
-            print(f"Client {addr} disconnected unexpectedly")
+            logging.exception(f"Client {addr} disconnected unexpectedly")
         except ConnectionAbortedError as e:
-            print(f"Connection aborted with {addr}: {e}")
+            logging.exception(f"Connection aborted with {addr}: {e}")
         finally:
             conn.close()
-            print(f"Connection with {addr} closed")
+            logging.info(f"Connection with {addr} closed")
 
 
     def process_request(self, request: dict) -> dict:
@@ -120,10 +120,10 @@ class DatabaseServer:
     def check_login(username: str, password: str) -> dict:
         user = user_service.get_by_username(username)
         if not user:
-            logging.exception("User not found")
+            logging.error("User not found")
             return {"status": "error", "message": "User not found"}
         if user['password'] != user_service.get_password_hash(password):
-            logging.exception("Wrong password")
+            logging.error("Wrong password")
             return {"status": "error", "message": "Incorrect password"}
 
         return {"status":"success", "user": user_schema.dump(user)}
@@ -168,7 +168,7 @@ class DatabaseServer:
     def load_users() -> dict:
         users = user_service.get_all()
         if not users:
-            logging.exception("No users found")
+            logging.error("No users found")
             return {"status": "error", "message": "No users found"}
 
         return {"status": "success", "users": users}
