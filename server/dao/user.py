@@ -59,7 +59,3 @@ class UserDAO:
         user = self.get_one(id)
         self.session.delete(user)
         self.session.commit()
-
-# run debugger
-if __name__ == "__main__":
-    pass

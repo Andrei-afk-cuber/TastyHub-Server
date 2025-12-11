@@ -1,8 +1,6 @@
 from typing import List, Optional
 
-# necessary imports (temp)
 from sqlalchemy.orm import Session
-
 from server.dao.models.main import Product
 
 # dao for product model

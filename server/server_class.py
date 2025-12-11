@@ -197,12 +197,6 @@ class DatabaseServer:
     @staticmethod
     def delete_recipe(recipe_id: int) -> dict:
         try:
-            recipe = recipe_service.get_one(recipe_id)
-
-            image_path = os.path.join("recipe_images", recipe['picture_path'])
-            if os.path.exists(image_path):
-                os.remove(image_path)
-
             recipe_service.delete(recipe_id)
             return {"status": "success"}
         except Exception as e:

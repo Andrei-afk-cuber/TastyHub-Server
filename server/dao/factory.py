@@ -67,9 +67,3 @@ class DAOFactory:
             raise
         finally:
             session.close()
-
-# Using factory-class example
-if __name__ == "__main__":
-    factory = DAOFactory()
-    with factory.user_dao() as u:
-        print(u.get_by_username('admin'))
