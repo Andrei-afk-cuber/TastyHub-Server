@@ -10,6 +10,14 @@ The client can be installed:
 ```commandline
 git clone https://github.com/Andrei-afk-cuber/TastyHub-Version-2.git
 ```
+Create virtual environment:
+```
+python -m venv .venv
+```
+Activate venv:
+```
+.venv/Scripts/activate
+```
 For install all libraries:
 ```commandline
 pip install -r requirements.txt
