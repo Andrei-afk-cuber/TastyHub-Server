@@ -208,6 +208,12 @@ class RecipeService:
             if not picture_path:
                 raise ValueError('picture_path is empty')
 
+            try:
+                if not os.path.exists(IMAGE_PATH):
+                    os.mkdir(IMAGE_PATH)
+            except Exception as e:
+                pass
+
             filename = Path(picture_path).name
             save_path = IMAGE_PATH / filename
 
@@ -238,8 +244,11 @@ class RecipeService:
         image_dir = project_root / "recipe_images"
         image_path = image_dir / image_filename
 
-        if not os.path.exists(image_path):
-            os.mkdir(image_dir)
+        try:
+            if not os.path.exists(image_path):
+                os.mkdir(image_dir)
+        except Exception as e:
+            pass
 
         img = Image.open(image_path)
         max_size = (800, 800)
@@ -248,10 +257,3 @@ class RecipeService:
         img.save(buffer, format="JPEG", quality=85)
         image_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
         return image_data
-
-
-# debugger run
-if __name__ == '__main__':
-    factory = DAOFactory()
-    service = RecipeService(factory)
-    print(service.get_one(1))

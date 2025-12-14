@@ -22,3 +22,7 @@ For install all libraries:
 ```commandline
 pip install -r requirements.txt
 ```
+For run:
+```commandline
+python app.py
+```

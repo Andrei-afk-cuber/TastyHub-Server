@@ -155,7 +155,7 @@ class DatabaseServer:
             elif by_ingredients:
                 recipes = recipe_service.get_by_ingredients(by_ingredients)
             elif by_username:
-                recipes = recipe_service.get_by_username(by_username)
+                recipes = recipe_service.get_by_username(username=by_username)
             else:
                 recipes = recipe_service.get_all(only_confirmed)
             return {"status": "success", "recipes": recipes}
