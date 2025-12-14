@@ -2,7 +2,6 @@ import pytest
 
 from server.dao.models.main import User
 
-
 class TestUserDAO:
     def test_create_user(self, factory, sample_user):
         # create user test

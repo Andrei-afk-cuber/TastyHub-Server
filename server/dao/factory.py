@@ -7,6 +7,7 @@ from server.dao.models.base import Base
 from server.dao.user import UserDAO
 from server.dao.recipe import RecipeDAO
 from server.dao.product import ProductDAO
+from server.dao.models.main import User
 
 # factory for get life-time session control
 class DAOFactory:
